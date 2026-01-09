@@ -584,7 +584,7 @@ button:active {
     box-shadow: var(--shadow-lg);
 }
 
-.panel.open {
+.panel.active {
     right: 0;
 }
 
