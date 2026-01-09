@@ -41,6 +41,7 @@ const state = {
     timeMinutes: 5,
     incrementSeconds: 0,
     playerColors: ['red', 'blue', 'yellow', 'green'], // Color names for each position
+    playerNames: ['Red', 'Blue', 'Yellow', 'Green'], // Custom names
     players: {
         red: { time: 300000, score: 0, eliminated: false },
         blue: { time: 300000, score: 0, eliminated: false },
@@ -124,6 +125,14 @@ function setupEventListeners() {
             elements.timeBtns.forEach(b => b.classList.remove('active'));
             state.timeMinutes = val;
         }
+    });
+
+    // Name inputs
+    $$('.name-input').forEach(input => {
+        input.addEventListener('input', (e) => {
+            const pos = parseInt(e.target.dataset.position);
+            state.playerNames[pos] = e.target.value.trim() || `Player ${pos + 1}`;
+        });
     });
 
     // Color picker
@@ -240,7 +249,7 @@ function startGame() {
     elements.setupScreen.classList.remove('active');
     elements.gameScreen.classList.add('active');
 
-    // Apply selected colors to player zones
+    // Apply selected colors and names to player zones
     applyPlayerColors();
 
     updateGameUI();
@@ -267,7 +276,7 @@ function applyPlayerColors() {
 
             // Update player name display
             const nameEl = zone.querySelector('.player-name');
-            nameEl.textContent = colorName.charAt(0).toUpperCase() + colorName.slice(1);
+            nameEl.textContent = state.playerNames[index];
         }
     });
 }
@@ -417,7 +426,8 @@ function updateGameUI() {
     elements.gameModeDisplay.textContent = state.mode === 'ffa' ? 'Free-for-All' : 'Teams';
 
     // Update turn indicator
-    const currentName = state.currentPlayer.charAt(0).toUpperCase() + state.currentPlayer.slice(1);
+    const currentPlayerIndex = PLAYERS.indexOf(state.currentPlayer);
+    const currentName = state.playerNames[currentPlayerIndex];
     elements.turnIndicator.textContent = state.isPaused ? 'PAUSED' : `${currentName}'s Turn`;
 
     // Update pause button
@@ -486,7 +496,10 @@ function applyAction(action, points) {
 
     updateGameUI();
     updateScorePanel();
-    showConfirmation(`+${points} ${player}`);
+
+    const playerIndex = PLAYERS.indexOf(player);
+    const playerName = state.playerNames[playerIndex];
+    showConfirmation(`+${points} ${playerName}`);
 }
 
 function applyCapture(piece, points) {
@@ -500,7 +513,10 @@ function applyCapture(piece, points) {
 
     updateGameUI();
     updateScorePanel();
-    showConfirmation(`+${points} ${selectedActionPlayer}`);
+
+    const playerIndex = PLAYERS.indexOf(selectedActionPlayer);
+    const playerName = state.playerNames[playerIndex];
+    showConfirmation(`+${points} ${playerName}`);
 }
 
 function applyStatus(status) {
@@ -551,9 +567,21 @@ function showConfirmation(text) {
 }
 
 function updateScorePanel() {
-    PLAYERS.forEach(player => {
+    PLAYERS.forEach((player, index) => {
         const item = $(`.score-item.${player}`);
         item.querySelector('.score-value').textContent = state.players[player].score;
+
+        // Update name in score panel too
+        const EmojiMap = { red: '🔴', blue: '🔵', yellow: '🟡', green: '🟢' };
+        // Use the current color of the player to determine emoji, or default based on position
+        const colorName = state.playerColors[index]; // current color
+        // Simple mapping based on original slots or dynamic? Let's just use the position icon
+        const icons = ['🔴', '🔵', '🟡', '🟢'];
+        item.querySelector('.score-player').textContent = `${icons[index]} ${state.playerNames[index]}`;
+
+        // Also update selection buttons in action panel
+        const selectBtn = $(`.player-select-btn.${player}`);
+        if (selectBtn) selectBtn.textContent = state.playerNames[index];
     });
 }
 
