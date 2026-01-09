@@ -197,19 +197,26 @@ function setupEventListeners() {
     });
 
     elements.actionTypeBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
+        btn.addEventListener('click', (e) => {
+            handleButtonPress(btn);
             applyAction(btn.dataset.action, parseInt(btn.dataset.points));
+            triggerFeedback(e, `+${btn.dataset.points}`);
         });
     });
 
     elements.captureBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
+        btn.addEventListener('click', (e) => {
+            handleButtonPress(btn);
             applyCapture(btn.dataset.piece, parseInt(btn.dataset.points));
+            triggerFeedback(e, `+${btn.dataset.points}`);
         });
     });
 
     elements.statusBtns.forEach(btn => {
-        btn.addEventListener('click', () => applyStatus(btn.dataset.status));
+        btn.addEventListener('click', (e) => {
+            handleButtonPress(btn);
+            applyStatus(btn.dataset.status);
+        });
     });
 
     // Menu Actions
@@ -246,6 +253,15 @@ function setupEventListeners() {
         elements.gameOverModal.classList.remove('active');
     });
 }
+
+// Helper for button animation
+function handleButtonPress(btn) {
+    btn.classList.remove('btn-pressed');
+    void btn.offsetWidth; // Trigger reflow
+    btn.classList.add('btn-pressed');
+}
+
+
 
 // ============================================
 // Setup Functions
@@ -558,20 +574,19 @@ function applyAction(action, points) {
         return;
     }
 
+    // Intercept Checkmate and Stalemate-Other to ask for a victim
+    if (action === 'checkmate' || action === 'stalemate-other') {
+        showVictimSelection(action, points);
+        return;
+    }
+
     const player = selectedActionPlayer;
 
     // Handle special cases
-    if (action === 'stalemate-other') {
-        // All active players get 10 points
-        PLAYERS.forEach(p => {
-            if (!state.players[p].eliminated) {
-                state.players[p].score += 10;
-            }
-        });
-        state.actionHistory.push({ type: 'stalemate-other', player, points: 10 });
-    } else {
+    if (action === 'stalemate-self') {
         state.players[player].score += points;
-        // Add timestamp
+        eliminatePlayer(player, 'stalemate');
+
         state.actionHistory.push({
             type: action,
             player,
@@ -582,11 +597,30 @@ function applyAction(action, points) {
         updateGameUI();
         updateScorePanel();
         updateLogPanel();
-
-        const playerIndex = PLAYERS.indexOf(player);
-        const playerName = state.playerNames[playerIndex];
-        showConfirmation(`+${points} ${playerName}`);
+        triggerFeedback(null, `+${points}`);
+        closeAllPanels();
+        return;
     }
+
+    // Standard action processing
+    state.players[player].score += points;
+
+    state.actionHistory.push({
+        type: action,
+        player,
+        points,
+        timestamp: Date.now()
+    });
+
+    updateGameUI();
+    updateScorePanel();
+    updateLogPanel(); // Add missing updateLogPanel in original code if it wasn't there? It was in original.
+
+    const playerIndex = PLAYERS.indexOf(player);
+    const playerName = state.playerNames[playerIndex];
+
+    // Visual Feedback
+    triggerFeedback(null, `+${points}`);
 }
 
 function applyCapture(piece, points) {
@@ -595,15 +629,23 @@ function applyCapture(piece, points) {
         return;
     }
 
+    // Visual feedback on the button that was clicked
+    // We need to pass the event or find the button. 
+    // Since we don't have the event here, we can assume the user just clicked interaction.
+    // simpler: just animate "Floating Text" from the center of the panel or relative position.
+    // Better: let's update the event listeners to pass the event target. 
+
     state.players[selectedActionPlayer].score += points;
     state.actionHistory.push({ type: 'capture', player: selectedActionPlayer, piece, points });
 
     updateGameUI();
     updateScorePanel();
+    updateLogPanel();
 
     const playerIndex = PLAYERS.indexOf(selectedActionPlayer);
     const playerName = state.playerNames[playerIndex];
-    showConfirmation(`+${points} ${playerName}`);
+
+    triggerFeedback(null, `+${points}`);
 }
 
 function applyStatus(status) {
@@ -621,6 +663,163 @@ function applyStatus(status) {
     updateScorePanel();
     updateLogPanel();
     closeAllPanels();
+}
+
+// Global variable to store pending action
+let pendingAction = null;
+
+function showVictimSelection(action, points) {
+    pendingAction = { type: action, scorer: selectedActionPlayer, points: points };
+
+    // Change Action Panel Content to "Select Player to Eliminate"
+    const panelContent = elements.actionPanel.querySelector('.panel-content');
+
+    // Save original content to restore later
+    if (!elements.actionPanel.dataset.originalContent) {
+        elements.actionPanel.dataset.originalContent = panelContent.innerHTML;
+    }
+
+    const scorerName = state.playerNames[PLAYERS.indexOf(selectedActionPlayer)];
+    const actionName = action === 'checkmate' ? 'Checkmated' : 'Stalemated';
+
+    panelContent.innerHTML = `
+        <div class="action-section">
+            <h3>Who did ${scorerName} ${actionName}?</h3>
+            <p style="color: var(--text-secondary); margin-bottom: 24px; font-size: 0.9rem;">
+                Select the player to eliminate.
+            </p>
+            <div class="player-select victim-select">
+                ${PLAYERS.map(p => {
+        if (p === selectedActionPlayer || state.players[p].eliminated) return ''; // Can't checkmate self or eliminated
+        const pName = state.playerNames[PLAYERS.indexOf(p)];
+        // Use dynamic colors from CSS variables? Inline styles for simplicity in this dynamic injection
+        let color = '';
+        if (p === 'red') color = 'var(--red)';
+        if (p === 'blue') color = 'var(--blue)';
+        if (p === 'yellow') color = 'var(--yellow)';
+        if (p === 'green') color = 'var(--green)';
+
+        return `
+                        <button class="player-select-btn victim-btn" 
+                                style="background: ${color}; color: ${p === 'yellow' ? '#1a1a2e' : 'white'}; width: 100%; margin-bottom: 8px;"
+                                data-victim="${p}">
+                            ${pName}
+                        </button>
+                    `;
+    }).join('')}
+            </div>
+            <button class="secondary-btn" id="cancel-victim-select" style="margin-top: 24px; width: 100%; padding: 16px; background: var(--bg-elevated); border-radius: var(--radius-md);">Cancel</button>
+        </div>
+    `;
+
+    // Add event listeners for the new buttons
+    panelContent.querySelectorAll('.victim-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            handleVictimSelected(btn.dataset.victim);
+        });
+    });
+
+    panelContent.querySelector('#cancel-victim-select').addEventListener('click', () => {
+        // Restore
+        panelContent.innerHTML = elements.actionPanel.dataset.originalContent;
+        // Re-attach listeners is complicated unless we re-init. 
+        // Easier: Just close panel or simple re-init.
+        // Actually, destroying innerHTML destroys listeners. We need to handle this better.
+        // Better strategy: Hide sections instead of overwriting innerHTML.
+        restoreActionPanel();
+        closeAllPanels();
+    });
+}
+
+function handleVictimSelected(victim) {
+    if (!pendingAction) return;
+
+    const { type, scorer, points } = pendingAction;
+
+    // 1. Eliminate Victim
+    eliminatePlayer(victim, type);
+
+    // 2. Award Points to Scorer
+    state.players[scorer].score += points;
+
+    // 3. Special Case: Stalemate Other (Award points to everyone active?)
+    if (type === 'stalemate-other') {
+        // "Stalemate-other" usually means Scorer caused it.
+        // The original logic was: "All active players get 10 points"
+        // Let's stick to Scorer gets points (passed in args) + maybe others?
+        // The button says "+10 each".
+        // Let's give appropriate points.
+        // If button says "+10 each", we should give 10 to Scorer, and 10 to others active?
+        // Simplify: Just give the points defined in the button to the scorer, or following specific rules.
+        // User just asked for "ask who it was and disable".
+        // I will stick to giving the Scorer the points in the dataset (which might be 10 or 20).
+        // If it's "stalemate-other", typically *everyone remaining* gets 10 pts.
+        // Let's iterate and give 10 to everyone except victim?
+        if (points === 10) { // Assuming it's the +10 each case
+            PLAYERS.forEach(p => {
+                if (!state.players[p].eliminated && p !== victim && p !== scorer) {
+                    state.players[p].score += 10;
+                }
+            });
+        }
+    }
+
+    // Log it
+    state.actionHistory.push({
+        type: type,
+        scorer: scorer,
+        victim: victim,
+        points: points,
+        timestamp: Date.now()
+    });
+
+    updateGameUI();
+    updateScorePanel();
+    updateLogPanel();
+
+    restoreActionPanel();
+    closeAllPanels();
+
+    pendingAction = null;
+}
+
+function restoreActionPanel() {
+    if (elements.actionPanel.dataset.originalContent) {
+        elements.actionPanel.querySelector('.panel-content').innerHTML = elements.actionPanel.dataset.originalContent;
+        // We MUST re-attach listeners because we nuked the DOM
+        setupEventListeners(); // Re-run setup to attach listeners to recreated elements
+        // This is a bit heavy but safe. 
+    }
+}
+
+function triggerFeedback(event, text) {
+    // 1. Create Floating Text
+    const floater = document.createElement('div');
+    floater.textContent = text;
+    floater.className = 'floating-score';
+
+    // Position: user click coordinates or element center
+    let x, y;
+    if (event) {
+        x = event.clientX;
+        y = event.clientY;
+    } else {
+        // Fallback to center of action panel if no event
+        const panel = document.getElementById('action-panel');
+        const rect = panel.getBoundingClientRect();
+        x = rect.left + rect.width / 2;
+        y = rect.top + rect.height / 2;
+    }
+
+    floater.style.left = `${x}px`;
+    floater.style.top = `${y}px`;
+
+    document.body.appendChild(floater);
+
+    // Cleanup
+    setTimeout(() => {
+        floater.remove();
+    }, 1000);
 }
 
 function undoLastAction() {

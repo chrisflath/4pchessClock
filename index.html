@@ -257,105 +257,112 @@
                 <button class="close-panel-btn">✕</button>
             </div>
             <div class="panel-content">
-                <div class="action-section">
-                    <h3>Who scored?</h3>
-                    <div class="player-select">
-                        <button class="player-select-btn red" data-player="red">Red</button>
-                        <button class="player-select-btn blue" data-player="blue">Blue</button>
-                        <button class="player-select-btn yellow" data-player="yellow">Yellow</button>
-                        <button class="player-select-btn green" data-player="green">Green</button>
+                <div id="action-main-content">
+                    <div class="action-section">
+                        <h3>Who scored?</h3>
+                        <div class="player-select">
+                            <button class="player-select-btn red" data-player="red">Red</button>
+                            <button class="player-select-btn blue" data-player="blue">Blue</button>
+                            <button class="player-select-btn yellow" data-player="yellow">Yellow</button>
+                            <button class="player-select-btn green" data-player="green">Green</button>
+                        </div>
+                    </div>
+
+                    <div class="action-section">
+                        <h3>Action Type</h3>
+                        <div class="action-grid">
+                            <button class="action-type-btn" data-action="checkmate" data-points="20">
+                                <span class="action-emoji">👑</span>
+                                <span class="action-name">Checkmate</span>
+                                <span class="action-points">+20</span>
+                            </button>
+                            <button class="action-type-btn" data-action="stalemate-self" data-points="20">
+                                <span class="action-emoji">🏳️</span>
+                                <span class="action-name">Self Stalemate</span>
+                                <span class="action-points">+20</span>
+                            </button>
+                            <button class="action-type-btn" data-action="stalemate-other" data-points="10">
+                                <span class="action-emoji">🤝</span>
+                                <span class="action-name">Stalemate Other</span>
+                                <span class="action-points">+10 each</span>
+                            </button>
+                            <button class="action-type-btn" data-action="double-check-queen" data-points="1">
+                                <span class="action-emoji">♛</span>
+                                <span class="action-name">2x Check (Queen)</span>
+                                <span class="action-points">+1</span>
+                            </button>
+                            <button class="action-type-btn" data-action="triple-check-queen" data-points="5">
+                                <span class="action-emoji">♛♛</span>
+                                <span class="action-name">3x Check (Queen)</span>
+                                <span class="action-points">+5</span>
+                            </button>
+                            <button class="action-type-btn" data-action="double-check" data-points="5">
+                                <span class="action-emoji">⚔️</span>
+                                <span class="action-name">2x Check (Other)</span>
+                                <span class="action-points">+5</span>
+                            </button>
+                            <button class="action-type-btn" data-action="triple-check" data-points="20">
+                                <span class="action-emoji">💥</span>
+                                <span class="action-name">3x Check (Other)</span>
+                                <span class="action-points">+20</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="action-section">
+                        <h3>Captures</h3>
+                        <div class="capture-grid">
+                            <button class="capture-btn" data-piece="pawn" data-points="1">
+                                <span class="piece-icon">♙</span>
+                                <span class="piece-name">Pawn</span>
+                                <span class="piece-points">+1</span>
+                            </button>
+                            <button class="capture-btn" data-piece="knight" data-points="3">
+                                <span class="piece-icon">♘</span>
+                                <span class="piece-name">Knight</span>
+                                <span class="piece-points">+3</span>
+                            </button>
+                            <button class="capture-btn" data-piece="bishop" data-points="5">
+                                <span class="piece-icon">♗</span>
+                                <span class="piece-name">Bishop</span>
+                                <span class="piece-points">+5</span>
+                            </button>
+                            <button class="capture-btn" data-piece="rook" data-points="5">
+                                <span class="piece-icon">♖</span>
+                                <span class="piece-name">Rook</span>
+                                <span class="piece-points">+5</span>
+                            </button>
+                            <button class="capture-btn" data-piece="queen" data-points="9">
+                                <span class="piece-icon">♕</span>
+                                <span class="piece-name">Queen</span>
+                                <span class="piece-points">+9</span>
+                            </button>
+                            <button class="capture-btn" data-piece="promoted-queen" data-points="1">
+                                <span class="piece-icon">♕</span>
+                                <span class="piece-name">Promoted ♕</span>
+                                <span class="piece-points">+1</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="action-section">
+                        <h3>Player Status</h3>
+                        <div class="status-grid">
+                            <button class="status-btn eliminate" data-status="eliminate">
+                                <span class="status-icon">💀</span>
+                                <span class="status-name">Eliminate Player</span>
+                            </button>
+                            <button class="status-btn timeout" data-status="timeout">
+                                <span class="status-icon">⏱️</span>
+                                <span class="status-name">Time Out (Random King)</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
-                <div class="action-section">
-                    <h3>Action Type</h3>
-                    <div class="action-grid">
-                        <button class="action-type-btn" data-action="checkmate" data-points="20">
-                            <span class="action-emoji">👑</span>
-                            <span class="action-name">Checkmate</span>
-                            <span class="action-points">+20</span>
-                        </button>
-                        <button class="action-type-btn" data-action="stalemate-self" data-points="20">
-                            <span class="action-emoji">🏳️</span>
-                            <span class="action-name">Self Stalemate</span>
-                            <span class="action-points">+20</span>
-                        </button>
-                        <button class="action-type-btn" data-action="stalemate-other" data-points="10">
-                            <span class="action-emoji">🤝</span>
-                            <span class="action-name">Stalemate Other</span>
-                            <span class="action-points">+10 each</span>
-                        </button>
-                        <button class="action-type-btn" data-action="double-check-queen" data-points="1">
-                            <span class="action-emoji">♛</span>
-                            <span class="action-name">2x Check (Queen)</span>
-                            <span class="action-points">+1</span>
-                        </button>
-                        <button class="action-type-btn" data-action="triple-check-queen" data-points="5">
-                            <span class="action-emoji">♛♛</span>
-                            <span class="action-name">3x Check (Queen)</span>
-                            <span class="action-points">+5</span>
-                        </button>
-                        <button class="action-type-btn" data-action="double-check" data-points="5">
-                            <span class="action-emoji">⚔️</span>
-                            <span class="action-name">2x Check (Other)</span>
-                            <span class="action-points">+5</span>
-                        </button>
-                        <button class="action-type-btn" data-action="triple-check" data-points="20">
-                            <span class="action-emoji">💥</span>
-                            <span class="action-name">3x Check (Other)</span>
-                            <span class="action-points">+20</span>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="action-section">
-                    <h3>Captures</h3>
-                    <div class="capture-grid">
-                        <button class="capture-btn" data-piece="pawn" data-points="1">
-                            <span class="piece-icon">♙</span>
-                            <span class="piece-name">Pawn</span>
-                            <span class="piece-points">+1</span>
-                        </button>
-                        <button class="capture-btn" data-piece="knight" data-points="3">
-                            <span class="piece-icon">♘</span>
-                            <span class="piece-name">Knight</span>
-                            <span class="piece-points">+3</span>
-                        </button>
-                        <button class="capture-btn" data-piece="bishop" data-points="5">
-                            <span class="piece-icon">♗</span>
-                            <span class="piece-name">Bishop</span>
-                            <span class="piece-points">+5</span>
-                        </button>
-                        <button class="capture-btn" data-piece="rook" data-points="5">
-                            <span class="piece-icon">♖</span>
-                            <span class="piece-name">Rook</span>
-                            <span class="piece-points">+5</span>
-                        </button>
-                        <button class="capture-btn" data-piece="queen" data-points="9">
-                            <span class="piece-icon">♕</span>
-                            <span class="piece-name">Queen</span>
-                            <span class="piece-points">+9</span>
-                        </button>
-                        <button class="capture-btn" data-piece="promoted-queen" data-points="1">
-                            <span class="piece-icon">♕</span>
-                            <span class="piece-name">Promoted ♕</span>
-                            <span class="piece-points">+1</span>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="action-section">
-                    <h3>Player Status</h3>
-                    <div class="status-grid">
-                        <button class="status-btn eliminate" data-status="eliminate">
-                            <span class="status-icon">💀</span>
-                            <span class="status-name">Eliminate Player</span>
-                        </button>
-                        <button class="status-btn timeout" data-status="timeout">
-                            <span class="status-icon">⏱️</span>
-                            <span class="status-name">Time Out (Random King)</span>
-                        </button>
-                    </div>
+                <!-- Victim Selection (Hidden by default) -->
+                <div id="victim-selection" style="display: none;">
+                    <!-- Content injected via JS -->
                 </div>
             </div>
         </div>

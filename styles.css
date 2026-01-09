@@ -903,3 +903,46 @@ button:active {
         font-size: 4rem;
     }
 }
+
+/* Button Press Animation */
+.btn-pressed {
+    animation: btn-press 0.2s ease;
+}
+
+@keyframes btn-press {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(0.92);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Floating Score Animation */
+.floating-score {
+    position: fixed;
+    color: #2ecc71;
+    font-weight: 800;
+    font-size: 1.5rem;
+    pointer-events: none;
+    z-index: 2000;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    animation: float-up 1s ease-out forwards;
+}
+
+@keyframes float-up {
+    0% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateY(-50px) scale(1.2);
+    }
+}
