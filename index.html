@@ -147,6 +147,7 @@
                     <span id="turn-indicator">Red's Turn</span>
                 </div>
                 <button id="score-btn" class="icon-btn" aria-label="Scores">📊</button>
+                <button id="log-btn" class="icon-btn" aria-label="Log">📝</button>
             </div>
 
             <div class="player-grid">
@@ -358,6 +359,19 @@
             </div>
         </div>
 
+        <!-- Log Panel (Slide-in) -->
+        <div id="log-panel" class="panel">
+            <div class="panel-header">
+                <h2>Game Log</h2>
+                <button class="close-panel-btn">✕</button>
+            </div>
+            <div class="panel-content">
+                <div id="game-log-list" class="log-list">
+                    <div class="empty-state">No events yet</div>
+                </div>
+            </div>
+        </div>
+
         <!-- Menu Panel -->
         <div id="menu-panel" class="panel">
             <div class="panel-header">
@@ -372,6 +386,10 @@
                 <button class="menu-item" id="reset-clocks-btn">
                     <span class="menu-icon">🔄</span>
                     <span>Reset Clocks</span>
+                </button>
+                <button class="menu-item" id="finish-game-btn">
+                    <span class="menu-icon">🏁</span>
+                    <span>Finish Game</span>
                 </button>
                 <button class="menu-item" id="reset-scores-btn">
                     <span class="menu-icon">📊</span>
@@ -396,6 +414,18 @@
 
         <!-- Overlay -->
         <div id="overlay" class="overlay"></div>
+    </div>
+
+    <!-- Game Over Modal -->
+    <div id="game-over-modal" class="modal">
+        <div class="modal-content">
+            <h2>Game Over</h2>
+            <div id="results-container"></div>
+            <div class="modal-actions">
+                <button id="modal-new-game-btn" class="primary-btn">New Game</button>
+                <button id="modal-close-btn" class="secondary-btn">Close</button>
+            </div>
+        </div>
     </div>
 
     <script src="app.js"></script>
