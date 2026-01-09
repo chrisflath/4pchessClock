@@ -587,161 +587,162 @@ function applyAction(action, points) {
         const playerName = state.playerNames[playerIndex];
         showConfirmation(`+${points} ${playerName}`);
     }
+}
 
-    function applyCapture(piece, points) {
-        if (!selectedActionPlayer) {
-            alert('Please select a player first');
-            return;
-        }
-
-        state.players[selectedActionPlayer].score += points;
-        state.actionHistory.push({ type: 'capture', player: selectedActionPlayer, piece, points });
-
-        updateGameUI();
-        updateScorePanel();
-
-        const playerIndex = PLAYERS.indexOf(selectedActionPlayer);
-        const playerName = state.playerNames[playerIndex];
-        showConfirmation(`+${points} ${playerName}`);
+function applyCapture(piece, points) {
+    if (!selectedActionPlayer) {
+        alert('Please select a player first');
+        return;
     }
 
-    function applyStatus(status) {
-        if (!selectedActionPlayer) {
-            alert('Please select a player first');
-            return;
-        }
+    state.players[selectedActionPlayer].score += points;
+    state.actionHistory.push({ type: 'capture', player: selectedActionPlayer, piece, points });
 
-        if (status === 'eliminate' || status === 'timeout') {
-            eliminatePlayer(selectedActionPlayer, status);
-            state.actionHistory.push({ type: status, player: selectedActionPlayer, timestamp: Date.now() });
-        }
+    updateGameUI();
+    updateScorePanel();
 
-        updateGameUI();
-        updateScorePanel();
-        updateLogPanel();
-        closeAllPanels();
+    const playerIndex = PLAYERS.indexOf(selectedActionPlayer);
+    const playerName = state.playerNames[playerIndex];
+    showConfirmation(`+${points} ${playerName}`);
+}
+
+function applyStatus(status) {
+    if (!selectedActionPlayer) {
+        alert('Please select a player first');
+        return;
     }
 
-    function undoLastAction() {
-        if (state.actionHistory.length === 0) return;
-
-        const lastAction = state.actionHistory.pop();
-
-        if (lastAction.type === 'stalemate-other') {
-            PLAYERS.forEach(p => {
-                if (!state.players[p].eliminated) {
-                    state.players[p].score -= 10;
-                }
-            });
-        } else if (lastAction.points) {
-            state.players[lastAction.player].score -= lastAction.points;
-        } else if (lastAction.type === 'eliminate' || lastAction.type === 'timeout') {
-            state.players[lastAction.player].eliminated = false;
-        }
-
-        updateGameUI();
-        updateScorePanel();
+    if (status === 'eliminate' || status === 'timeout') {
+        eliminatePlayer(selectedActionPlayer, status);
+        state.actionHistory.push({ type: status, player: selectedActionPlayer, timestamp: Date.now() });
     }
 
-    function showConfirmation(text) {
-        // Brief visual feedback
-        const btn = elements.actionBtn;
-        const originalText = btn.textContent;
-        btn.textContent = text;
-        setTimeout(() => {
-            btn.textContent = originalText;
-        }, 800);
-    }
+    updateGameUI();
+    updateScorePanel();
+    updateLogPanel();
+    closeAllPanels();
+}
 
-    function updateScorePanel() {
-        PLAYERS.forEach((player, index) => {
-            const item = $(`.score-item.${player}`);
-            item.querySelector('.score-value').textContent = state.players[player].score;
+function undoLastAction() {
+    if (state.actionHistory.length === 0) return;
 
-            // Update name in score panel too
-            const EmojiMap = { red: '🔴', blue: '🔵', yellow: '🟡', green: '🟢' };
-            // Use the current color of the player to determine emoji, or default based on position
-            const colorName = state.playerColors[index]; // current color
-            // Simple mapping based on original slots or dynamic? Let's just use the position icon
-            const icons = ['🔴', '🔵', '🟡', '🟢'];
-            item.querySelector('.score-player').textContent = `${icons[index]} ${state.playerNames[index]}`;
+    const lastAction = state.actionHistory.pop();
 
-            // Also update selection buttons in action panel
-            const selectBtn = $(`.player-select-btn.${player}`);
-            if (selectBtn) selectBtn.textContent = state.playerNames[index];
+    if (lastAction.type === 'stalemate-other') {
+        PLAYERS.forEach(p => {
+            if (!state.players[p].eliminated) {
+                state.players[p].score -= 10;
+            }
         });
+    } else if (lastAction.points) {
+        state.players[lastAction.player].score -= lastAction.points;
+    } else if (lastAction.type === 'eliminate' || lastAction.type === 'timeout') {
+        state.players[lastAction.player].eliminated = false;
     }
 
-    // ============================================
-    // Panel Functions
-    // ============================================
+    updateGameUI();
+    updateScorePanel();
+}
 
-    function openPanel(panel) {
-        closeAllPanels();
+function showConfirmation(text) {
+    // Brief visual feedback
+    const btn = elements.actionBtn;
+    const originalText = btn.textContent;
+    btn.textContent = text;
+    setTimeout(() => {
+        btn.textContent = originalText;
+    }, 800);
+}
 
-        // If panel is a string (legacy support) or an element
-        let panelEl = panel;
-        if (typeof panel === 'string') {
-            if (panel === 'score') panelEl = elements.scorePanel;
-            else if (panel === 'action') panelEl = elements.actionPanel;
-            else if (panel === 'menu') panelEl = elements.menuPanel;
-        }
+function updateScorePanel() {
+    PLAYERS.forEach((player, index) => {
+        const item = $(`.score-item.${player}`);
+        item.querySelector('.score-value').textContent = state.players[player].score;
 
-        if (panelEl) {
-            panelEl.classList.add('active'); // Changed from 'open' to 'active' to match CSS
-        }
+        // Update name in score panel too
+        const EmojiMap = { red: '🔴', blue: '🔵', yellow: '🟡', green: '🟢' };
+        // Use the current color of the player to determine emoji, or default based on position
+        const colorName = state.playerColors[index]; // current color
+        // Simple mapping based on original slots or dynamic? Let's just use the position icon
+        const icons = ['🔴', '🔵', '🟡', '🟢'];
+        item.querySelector('.score-player').textContent = `${icons[index]} ${state.playerNames[index]}`;
 
-        // Special logic for action panel initialization
-        if (panelEl === elements.actionPanel) {
-            selectedActionPlayer = state.currentPlayer;
-            selectActionPlayer(selectedActionPlayer);
-        }
+        // Also update selection buttons in action panel
+        const selectBtn = $(`.player-select-btn.${player}`);
+        if (selectBtn) selectBtn.textContent = state.playerNames[index];
+    });
+}
 
-        // Log panel auto-update is handled by the click listener now
+// ============================================
+// Panel Functions
+// ============================================
 
-        elements.overlay.classList.add('active');
+function openPanel(panel) {
+    closeAllPanels();
 
-        if (!state.isPaused && state.gameStarted) {
-            togglePause();
-        }
+    // If panel is a string (legacy support) or an element
+    let panelEl = panel;
+    if (typeof panel === 'string') {
+        if (panel === 'score') panelEl = elements.scorePanel;
+        else if (panel === 'action') panelEl = elements.actionPanel;
+        else if (panel === 'menu') panelEl = elements.menuPanel;
     }
 
-    function closeAllPanels() {
-        $$('.panel').forEach(p => p.classList.remove('active'));
-        elements.overlay.classList.remove('active');
+    if (panelEl) {
+        panelEl.classList.add('active'); // Changed from 'open' to 'active' to match CSS
     }
 
-    function updateLogPanel() {
-        const logList = document.getElementById('game-log-list');
-        if (!logList) return;
+    // Special logic for action panel initialization
+    if (panelEl === elements.actionPanel) {
+        selectedActionPlayer = state.currentPlayer;
+        selectActionPlayer(selectedActionPlayer);
+    }
 
-        if (state.actionHistory.length === 0) {
-            logList.innerHTML = '<div class="empty-state">No events yet</div>';
-            return;
-        }
+    // Log panel auto-update is handled by the click listener now
 
-        // Clone and reverse to show newest first
-        const history = [...state.actionHistory].reverse();
+    elements.overlay.classList.add('active');
 
-        logList.innerHTML = history.map(action => {
-            // Find player details
-            const pIndex = PLAYERS.indexOf(action.player);
-            const name = state.playerNames[pIndex];
-            const pointClass = action.points >= 0 ? 'positive' : 'negative';
-            const sign = action.points > 0 ? '+' : '';
-            const pointsDisplay = action.points !== undefined ? `${sign}${action.points}` : '';
+    if (!state.isPaused && state.gameStarted) {
+        togglePause();
+    }
+}
 
-            let details = action.type;
-            if (action.type === 'capture') details = `Captured ${action.piece}`;
-            if (action.type === 'checkmate') details = 'Checkmate';
-            if (action.type === 'check') details = 'Check';
-            if (action.type === 'stalemate') details = 'Stalemate';
+function closeAllPanels() {
+    $$('.panel').forEach(p => p.classList.remove('active'));
+    elements.overlay.classList.remove('active');
+}
 
-            // Simple time formatting (relative)
-            const date = action.timestamp ? new Date(action.timestamp) : new Date();
-            const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+function updateLogPanel() {
+    const logList = document.getElementById('game-log-list');
+    if (!logList) return;
 
-            return `
+    if (state.actionHistory.length === 0) {
+        logList.innerHTML = '<div class="empty-state">No events yet</div>';
+        return;
+    }
+
+    // Clone and reverse to show newest first
+    const history = [...state.actionHistory].reverse();
+
+    logList.innerHTML = history.map(action => {
+        // Find player details
+        const pIndex = PLAYERS.indexOf(action.player);
+        const name = state.playerNames[pIndex];
+        const pointClass = action.points >= 0 ? 'positive' : 'negative';
+        const sign = action.points > 0 ? '+' : '';
+        const pointsDisplay = action.points !== undefined ? `${sign}${action.points}` : '';
+
+        let details = action.type;
+        if (action.type === 'capture') details = `Captured ${action.piece}`;
+        if (action.type === 'checkmate') details = 'Checkmate';
+        if (action.type === 'check') details = 'Check';
+        if (action.type === 'stalemate') details = 'Stalemate';
+
+        // Simple time formatting (relative)
+        const date = action.timestamp ? new Date(action.timestamp) : new Date();
+        const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+        return `
             <div class="log-item ${action.player}">
                 <span class="log-time">${timeStr}</span>
                 <div class="log-content">
@@ -750,46 +751,46 @@ function applyAction(action, points) {
                 <span class="log-points ${pointClass}">${pointsDisplay}</span>
             </div>
         `;
-        }).join('');
-    }
+    }).join('');
+}
 
-    // ============================================
-    // Reset Functions
-    // ============================================
+// ============================================
+// Reset Functions
+// ============================================
 
-    function resetClocks() {
-        const timeMs = state.timeMinutes * 60 * 1000;
+function resetClocks() {
+    const timeMs = state.timeMinutes * 60 * 1000;
 
-        PLAYERS.forEach(p => {
-            state.players[p].time = timeMs;
-            state.players[p].eliminated = false;
-        });
+    PLAYERS.forEach(p => {
+        state.players[p].time = timeMs;
+        state.players[p].eliminated = false;
+    });
 
-        state.currentPlayer = 'red';
-        state.isRunning = false;
-        state.isPaused = true;
-        state.gameStarted = false;
-        stopTimer();
+    state.currentPlayer = 'red';
+    state.isRunning = false;
+    state.isPaused = true;
+    state.gameStarted = false;
+    stopTimer();
 
-        closeAllPanels();
-        updateGameUI();
-    }
+    closeAllPanels();
+    updateGameUI();
+}
 
-    function resetScores() {
-        PLAYERS.forEach(p => {
-            state.players[p].score = 0;
-        });
+function resetScores() {
+    PLAYERS.forEach(p => {
+        state.players[p].score = 0;
+    });
 
-        state.actionHistory = [];
+    state.actionHistory = [];
 
-        closeAllPanels();
-        updateGameUI();
-        updateScorePanel();
-        updateLogPanel();
-    }
+    closeAllPanels();
+    updateGameUI();
+    updateScorePanel();
+    updateLogPanel();
+}
 
-    // ============================================
-    // Start App
-    // ============================================
+// ============================================
+// Start App
+// ============================================
 
-    document.addEventListener('DOMContentLoaded', init);
+document.addEventListener('DOMContentLoaded', init);
