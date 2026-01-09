@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="description"
+        content="4-Player Chess Clock and Score Tracker - Mobile-optimized timer and point tracker for 4-player chess games">
+    <meta name="theme-color" content="#1a1a2e">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>4P Chess Clock & Scorer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div id="app">
+        <!-- Setup Screen -->
+        <div id="setup-screen" class="screen active">
+            <div class="setup-container">
+                <h1 class="logo">
+                    <span class="logo-icon">♛</span>
+                    4P Chess
+                </h1>
+                <p class="subtitle">Clock & Score Tracker</p>
+
+                <div class="setup-card">
+                    <h2>Game Mode</h2>
+                    <div class="mode-selector">
+                        <button class="mode-btn active" data-mode="ffa">
+                            <span class="mode-icon">⚔️</span>
+                            <span class="mode-label">Free-for-All</span>
+                        </button>
+                        <button class="mode-btn" data-mode="teams">
+                            <span class="mode-icon">🤝</span>
+                            <span class="mode-label">Teams</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="setup-card">
+                    <h2>Player Colors</h2>
+                    <div class="color-picker-grid">
+                        <div class="color-picker-row" data-position="0">
+                            <span class="position-label">P1</span>
+                            <div class="color-options">
+                                <button class="color-swatch active" data-color="red"
+                                    style="--swatch-color: #e74c3c"></button>
+                                <button class="color-swatch" data-color="orange"
+                                    style="--swatch-color: #e67e22"></button>
+                                <button class="color-swatch" data-color="brown"
+                                    style="--swatch-color: #8b4513"></button>
+                                <button class="color-swatch" data-color="black"
+                                    style="--swatch-color: #1a1a1a"></button>
+                                <button class="color-swatch" data-color="charcoal"
+                                    style="--swatch-color: #36454f"></button>
+                            </div>
+                        </div>
+                        <div class="color-picker-row" data-position="1">
+                            <span class="position-label">P2</span>
+                            <div class="color-options">
+                                <button class="color-swatch active" data-color="blue"
+                                    style="--swatch-color: #3498db"></button>
+                                <button class="color-swatch" data-color="navy" style="--swatch-color: #2c3e50"></button>
+                                <button class="color-swatch" data-color="tan" style="--swatch-color: #d2b48c"></button>
+                                <button class="color-swatch" data-color="black"
+                                    style="--swatch-color: #1a1a1a"></button>
+                                <button class="color-swatch" data-color="walnut"
+                                    style="--swatch-color: #5d432c"></button>
+                            </div>
+                        </div>
+                        <div class="color-picker-row" data-position="2">
+                            <span class="position-label">P3</span>
+                            <div class="color-options">
+                                <button class="color-swatch active" data-color="yellow"
+                                    style="--swatch-color: #f1c40f"></button>
+                                <button class="color-swatch" data-color="gold" style="--swatch-color: #ffc107"></button>
+                                <button class="color-swatch" data-color="coffee"
+                                    style="--swatch-color: #6f4e37"></button>
+                                <button class="color-swatch" data-color="black"
+                                    style="--swatch-color: #1a1a1a"></button>
+                                <button class="color-swatch" data-color="cream"
+                                    style="--swatch-color: #fff59d"></button>
+                            </div>
+                        </div>
+                        <div class="color-picker-row" data-position="3">
+                            <span class="position-label">P4</span>
+                            <div class="color-options">
+                                <button class="color-swatch active" data-color="green"
+                                    style="--swatch-color: #2ecc71"></button>
+                                <button class="color-swatch" data-color="forest"
+                                    style="--swatch-color: #4caf50"></button>
+                                <button class="color-swatch" data-color="mahogany"
+                                    style="--swatch-color: #c04000"></button>
+                                <button class="color-swatch" data-color="black"
+                                    style="--swatch-color: #1a1a1a"></button>
+                                <button class="color-swatch" data-color="espresso"
+                                    style="--swatch-color: #3c1414"></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="setup-card">
+                    <h2>Time Control</h2>
+                    <div class="time-presets">
+                        <button class="time-btn" data-minutes="3">3 min</button>
+                        <button class="time-btn active" data-minutes="5">5 min</button>
+                        <button class="time-btn" data-minutes="10">10 min</button>
+                        <button class="time-btn" data-minutes="15">15 min</button>
+                    </div>
+                    <div class="custom-time">
+                        <label>Custom (minutes):</label>
+                        <input type="number" id="custom-time" min="1" max="60" placeholder="—">
+                    </div>
+                </div>
+
+                <div class="setup-card">
+                    <h2>Increment (seconds)</h2>
+                    <div class="increment-presets">
+                        <button class="increment-btn active" data-seconds="0">0</button>
+                        <button class="increment-btn" data-seconds="2">+2</button>
+                        <button class="increment-btn" data-seconds="5">+5</button>
+                        <button class="increment-btn" data-seconds="10">+10</button>
+                    </div>
+                </div>
+
+                <button id="start-game" class="primary-btn">
+                    <span>Start Game</span>
+                    <span class="btn-arrow">→</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="game-screen" class="screen">
+            <div class="game-header">
+                <button id="menu-btn" class="icon-btn" aria-label="Menu">☰</button>
+                <div class="game-info">
+                    <span id="game-mode-display">Free-for-All</span>
+                    <span class="separator">•</span>
+                    <span id="turn-indicator">Red's Turn</span>
+                </div>
+                <button id="score-btn" class="icon-btn" aria-label="Scores">📊</button>
+            </div>
+
+            <div class="player-grid">
+                <!-- Red Player (Top) -->
+                <div class="player-zone red" data-player="red">
+                    <div class="player-card">
+                        <div class="player-header">
+                            <span class="player-name">Red</span>
+                            <span class="player-score">0 pts</span>
+                        </div>
+                        <div class="timer-display">
+                            <span class="time">5:00</span>
+                        </div>
+                        <div class="player-status"></div>
+                    </div>
+                </div>
+
+                <!-- Blue Player (Right) -->
+                <div class="player-zone blue" data-player="blue">
+                    <div class="player-card">
+                        <div class="player-header">
+                            <span class="player-name">Blue</span>
+                            <span class="player-score">0 pts</span>
+                        </div>
+                        <div class="timer-display">
+                            <span class="time">5:00</span>
+                        </div>
+                        <div class="player-status"></div>
+                    </div>
+                </div>
+
+                <!-- Yellow Player (Bottom) -->
+                <div class="player-zone yellow" data-player="yellow">
+                    <div class="player-card">
+                        <div class="player-header">
+                            <span class="player-name">Yellow</span>
+                            <span class="player-score">0 pts</span>
+                        </div>
+                        <div class="timer-display">
+                            <span class="time">5:00</span>
+                        </div>
+                        <div class="player-status"></div>
+                    </div>
+                </div>
+
+                <!-- Green Player (Left) -->
+                <div class="player-zone green" data-player="green">
+                    <div class="player-card">
+                        <div class="player-header">
+                            <span class="player-name">Green</span>
+                            <span class="player-score">0 pts</span>
+                        </div>
+                        <div class="timer-display">
+                            <span class="time">5:00</span>
+                        </div>
+                        <div class="player-status"></div>
+                    </div>
+                </div>
+
+                <!-- Center Controls -->
+                <div class="center-controls">
+                    <button id="pause-btn" class="control-btn pause">
+                        <span class="pause-icon">❚❚</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="game-footer">
+                <button id="undo-btn" class="footer-btn">↩ Undo</button>
+                <button id="action-btn" class="footer-btn primary">+ Action</button>
+            </div>
+        </div>
+
+        <!-- Score Panel (Slide-in) -->
+        <div id="score-panel" class="panel">
+            <div class="panel-header">
+                <h2>Scores</h2>
+                <button class="close-panel-btn">✕</button>
+            </div>
+            <div class="panel-content">
+                <div class="score-list">
+                    <div class="score-item red">
+                        <span class="score-player">🔴 Red</span>
+                        <span class="score-value">0</span>
+                    </div>
+                    <div class="score-item blue">
+                        <span class="score-player">🔵 Blue</span>
+                        <span class="score-value">0</span>
+                    </div>
+                    <div class="score-item yellow">
+                        <span class="score-player">🟡 Yellow</span>
+                        <span class="score-value">0</span>
+                    </div>
+                    <div class="score-item green">
+                        <span class="score-player">🟢 Green</span>
+                        <span class="score-value">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Panel (Slide-in) -->
+        <div id="action-panel" class="panel">
+            <div class="panel-header">
+                <h2>Score Action</h2>
+                <button class="close-panel-btn">✕</button>
+            </div>
+            <div class="panel-content">
+                <div class="action-section">
+                    <h3>Who scored?</h3>
+                    <div class="player-select">
+                        <button class="player-select-btn red" data-player="red">Red</button>
+                        <button class="player-select-btn blue" data-player="blue">Blue</button>
+                        <button class="player-select-btn yellow" data-player="yellow">Yellow</button>
+                        <button class="player-select-btn green" data-player="green">Green</button>
+                    </div>
+                </div>
+
+                <div class="action-section">
+                    <h3>Action Type</h3>
+                    <div class="action-grid">
+                        <button class="action-type-btn" data-action="checkmate" data-points="20">
+                            <span class="action-emoji">👑</span>
+                            <span class="action-name">Checkmate</span>
+                            <span class="action-points">+20</span>
+                        </button>
+                        <button class="action-type-btn" data-action="stalemate-self" data-points="20">
+                            <span class="action-emoji">🏳️</span>
+                            <span class="action-name">Self Stalemate</span>
+                            <span class="action-points">+20</span>
+                        </button>
+                        <button class="action-type-btn" data-action="stalemate-other" data-points="10">
+                            <span class="action-emoji">🤝</span>
+                            <span class="action-name">Stalemate Other</span>
+                            <span class="action-points">+10 each</span>
+                        </button>
+                        <button class="action-type-btn" data-action="double-check-queen" data-points="1">
+                            <span class="action-emoji">♛</span>
+                            <span class="action-name">2x Check (Queen)</span>
+                            <span class="action-points">+1</span>
+                        </button>
+                        <button class="action-type-btn" data-action="triple-check-queen" data-points="5">
+                            <span class="action-emoji">♛♛</span>
+                            <span class="action-name">3x Check (Queen)</span>
+                            <span class="action-points">+5</span>
+                        </button>
+                        <button class="action-type-btn" data-action="double-check" data-points="5">
+                            <span class="action-emoji">⚔️</span>
+                            <span class="action-name">2x Check (Other)</span>
+                            <span class="action-points">+5</span>
+                        </button>
+                        <button class="action-type-btn" data-action="triple-check" data-points="20">
+                            <span class="action-emoji">💥</span>
+                            <span class="action-name">3x Check (Other)</span>
+                            <span class="action-points">+20</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="action-section">
+                    <h3>Captures</h3>
+                    <div class="capture-grid">
+                        <button class="capture-btn" data-piece="pawn" data-points="1">
+                            <span class="piece-icon">♙</span>
+                            <span class="piece-name">Pawn</span>
+                            <span class="piece-points">+1</span>
+                        </button>
+                        <button class="capture-btn" data-piece="knight" data-points="3">
+                            <span class="piece-icon">♘</span>
+                            <span class="piece-name">Knight</span>
+                            <span class="piece-points">+3</span>
+                        </button>
+                        <button class="capture-btn" data-piece="bishop" data-points="5">
+                            <span class="piece-icon">♗</span>
+                            <span class="piece-name">Bishop</span>
+                            <span class="piece-points">+5</span>
+                        </button>
+                        <button class="capture-btn" data-piece="rook" data-points="5">
+                            <span class="piece-icon">♖</span>
+                            <span class="piece-name">Rook</span>
+                            <span class="piece-points">+5</span>
+                        </button>
+                        <button class="capture-btn" data-piece="queen" data-points="9">
+                            <span class="piece-icon">♕</span>
+                            <span class="piece-name">Queen</span>
+                            <span class="piece-points">+9</span>
+                        </button>
+                        <button class="capture-btn" data-piece="promoted-queen" data-points="1">
+                            <span class="piece-icon">♕</span>
+                            <span class="piece-name">Promoted ♕</span>
+                            <span class="piece-points">+1</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="action-section">
+                    <h3>Player Status</h3>
+                    <div class="status-grid">
+                        <button class="status-btn eliminate" data-status="eliminate">
+                            <span class="status-icon">💀</span>
+                            <span class="status-name">Eliminate Player</span>
+                        </button>
+                        <button class="status-btn timeout" data-status="timeout">
+                            <span class="status-icon">⏱️</span>
+                            <span class="status-name">Time Out (Random King)</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Menu Panel -->
+        <div id="menu-panel" class="panel">
+            <div class="panel-header">
+                <h2>Menu</h2>
+                <button class="close-panel-btn">✕</button>
+            </div>
+            <div class="panel-content">
+                <button class="menu-item" id="new-game-btn">
+                    <span class="menu-icon">🆕</span>
+                    <span>New Game</span>
+                </button>
+                <button class="menu-item" id="reset-clocks-btn">
+                    <span class="menu-icon">🔄</span>
+                    <span>Reset Clocks</span>
+                </button>
+                <button class="menu-item" id="reset-scores-btn">
+                    <span class="menu-icon">📊</span>
+                    <span>Reset Scores Only</span>
+                </button>
+                <div class="menu-divider"></div>
+                <div class="menu-info">
+                    <h4>Turn Order</h4>
+                    <p>Red → Blue → Yellow → Green (clockwise)</p>
+                </div>
+                <div class="menu-info">
+                    <h4>Quick Reference</h4>
+                    <ul>
+                        <li>Checkmate: +20 pts</li>
+                        <li>Self-stalemate: +20 pts</li>
+                        <li>Stalemate other: +10 each</li>
+                        <li>Captures: ♙+1, ♘+3, ♗+5, ♖+5, ♕+9</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Overlay -->
+        <div id="overlay" class="overlay"></div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
